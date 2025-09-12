@@ -6,6 +6,8 @@ import { v4 as uuidv4 } from "uuid";
 import { customAlphabet } from "nanoid";
 import { generateToken, verifyToken } from "../../../Utils/tokens.utils.js";
 import BlackListedTokens from "../../../DB/Models/black-listed-tokens.model.js";
+import mongoose from "mongoose";
+import Messages from "../../../DB/Models/message.model.js";
 const uniqueString = customAlphabet('jsdgfbugihskdn' , 5)
 
 
@@ -184,23 +186,38 @@ export const UpdateAccountService = async(req , res)=>{
 };
 
 
-export const DeleteAccountService = async (req , res)=>{
-   
-        const {_id} = req.loggedInUser;
-        
-        const deletedUser = await User.findByIdAndDelete({_id});
-        if(!deletedUser){
-            return res.status(404).json({message : "User not found"});
-        }
+export const DeleteAccountService = async (req, res) => {
+  // start session
+  const session = await mongoose.startSession();
+    const {user: { _id },} = req.loggedInUser;
 
-        return res.status(200).json({message : "User deleted successfully" , deletedUser})
+    // start transaction
+    session.startTransaction();
 
-   
+    const deletedUser = await User.findByIdAndDelete({ _id }, { session });
+    if (!deletedUser) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    await Messages.deleteMany({ receiverId: _id }, { session });
+
+    // commit transaction
+    await session.commitTransaction();
+
+    // end sessionnode
+    session.endSession();
+    console.log("The transaction is committed");
+
+    return res.status(200).json({ message: "User deleted successfully", deletedUser });
+  
 };
 
 
+
 export const ListUsersService = async (req, res) =>{
-    let users = await User.find().populate("Messages")
+    let users = await User.find().populate("Messages").select("firstName lastName age gender email phoneNumber")
 
     // users = users.map((user) => {
     //     let phone = user.phoneNumber;
@@ -218,7 +235,7 @@ export const ListUsersService = async (req, res) =>{
     //         phoneNumber: phone
     //     };
     // });
-
+    
     return res.status(200).json({ users });
 };
 
@@ -256,3 +273,5 @@ export const RefreshTokensService = async (req , res)=>{
 
         return res.status(200).json({message : "User token if refreshed successfully" , accesstoken})
 }
+
+
