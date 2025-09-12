@@ -14,6 +14,7 @@ router.post('/logout' , authenticationMiddleware ,  userServices.LogoutService);
 
 router.post('/refresh-token' , userServices.RefreshTokensService);
 router.post('/forget-password' , userServices.ForgetPasswordService);
+router.post('/reset-password' , userServices.ResetPasswordService);
 
 // Account Routes
 router.put('/update' , authenticationMiddleware , userServices.UpdateAccountService);

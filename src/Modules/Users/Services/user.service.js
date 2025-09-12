@@ -285,11 +285,11 @@ export const ForgetPasswordService = async (req , res)=>{
 
     const otp = uniqueString();
 
-    const otpEpired = Date.now(Date.now() + 60 * 60 * 1000);
+    const otpEpired = Date.now() + 60 * 60 * 1000;
 
     user.otps.resetPassword = {
         code : hashSync(otp , +process.env.SALT_ROUNDS),
-        expiredAt : otpEpired
+        expiresAt : otpEpired
     }
     await user.save()
 
@@ -301,3 +301,31 @@ export const ForgetPasswordService = async (req , res)=>{
     
     res.status(200).json({message : "Reset Password OTP IS sent successfully to your Email"})
 }
+
+
+export const ResetPasswordService = async (req , res)=>{
+    const {email , otp , newPassword}  = req.body;
+
+    const user = await User.findOne({email , provider:ProviderEnum.LOCAL})
+    
+    if(!user) return res.status(404).json({message : "User Not Foun"})
+
+    if(!user.otps?.resetPassword?.code)  return res.status(400).json({message : "OTP Not Foun"})
+
+    if(Date.now() > user.otps.resetPassword.expiresAt) return res.status(404).json({message : "OTP Expired"})
+    
+    const isOtpMatched = compareSync(otp , user.otps?.resetPassword.code)
+    if(!isOtpMatched) return res.status(404).json({message : "Invalid OTP"})
+
+    const hashPassword = hashSync(newPassword , +process.env.SALT_ROUNDS)
+
+    user.password = hashPassword
+
+    user.otps.resetPassword = {}
+
+    await user.save()
+
+    return res.status(200).json({message : "Password updated successfully to your Email"})
+}
+
+
