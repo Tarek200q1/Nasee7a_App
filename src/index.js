@@ -19,8 +19,15 @@ dbConnection();
 
 
 //Error handling middleware
-app.use((err , req , res , next) => {
+app.use(async(err , req , res , next) => {
     console.error(err.stack);
+    if(req.session && req.session.inTransaction()){
+        // abort transaction
+        await req.session.abortTransaction();
+        // end session
+        session.endSession();
+            console.log("The transaction is aborted", error);
+    }
     res.status(err.cause || 500).json({message : "something broke!" , err:err.message , stack: err.stack})
 });
 
