@@ -1,6 +1,6 @@
 // User Schema
 import mongoose from "mongoose";
-import { GenderEnum, RolesEnum } from "../../Common/enums/user.enum.js";
+import { GenderEnum, ProviderEnum, RolesEnum } from "../../Common/enums/user.enum.js";
 const userSchema = new mongoose.Schema(
   {
     firstName: {
@@ -58,7 +58,10 @@ const userSchema = new mongoose.Schema(
     },
     otps : {
       confirmation : String,
-      resetPassword : String
+      resetPassword : {
+        code :  String,
+        expiresAt : Date
+      },
     },
     isConfirmed : {
       type : Boolean,
@@ -68,6 +71,11 @@ const userSchema = new mongoose.Schema(
       type:String,
       enum:Object.values(RolesEnum),
       default:RolesEnum.USER
+    },
+    provider : {
+      type:String,
+      enum:Object.values(ProviderEnum),
+      default : ProviderEnum.LOCAL
     }
   },
   {

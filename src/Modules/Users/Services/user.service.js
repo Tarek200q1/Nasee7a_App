@@ -8,6 +8,7 @@ import { generateToken, verifyToken } from "../../../Utils/tokens.utils.js";
 import BlackListedTokens from "../../../DB/Models/black-listed-tokens.model.js";
 import mongoose from "mongoose";
 import Messages from "../../../DB/Models/message.model.js";
+import { ProviderEnum } from "../../../Common/enums/user.enum.js";
 const uniqueString = customAlphabet('jsdgfbugihskdn' , 5)
 
 
@@ -275,3 +276,28 @@ export const RefreshTokensService = async (req , res)=>{
 }
 
 
+export const ForgetPasswordService = async (req , res)=>{
+    const {email}  = req.body;
+
+    const user = await User.findOne({email , provider:ProviderEnum.LOCAL})
+    
+    if(!user) return res.status(404).json({message : "User Not Foun"})
+
+    const otp = uniqueString();
+
+    const otpEpired = Date.now(Date.now() + 60 * 60 * 1000);
+
+    user.otps.resetPassword = {
+        code : hashSync(otp , +process.env.SALT_ROUNDS),
+        expiredAt : otpEpired
+    }
+    await user.save()
+
+    emitter.emit("sendEmail" , {
+        to : user.email,
+        subject : "Reset Your Password",
+        content : `<h1>Your OTP ${otp}</h1>`
+    })
+    
+    res.status(200).json({message : "Reset Password OTP IS sent successfully to your Email"})
+}
