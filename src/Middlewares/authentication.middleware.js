@@ -33,7 +33,7 @@ export const authenticationMiddleware = async (req , res , next) => {
     if(!user) return res.status(404).json({message : "User not found"});
 
 
-    req.loggedInUser = {user , token:{tokenId:decodedData.jti ,  expirationDate:decodedData.exp}}
+    req.loggedInUser = {_id:user._id , user , token:{tokenId:decodedData.jti ,  expirationDate:decodedData.exp}}
 
 
     next()

@@ -329,3 +329,26 @@ export const ResetPasswordService = async (req , res)=>{
 }
 
 
+export const UpdatePasswordService = async (req , res)=>{
+    const {_id : userId} = req.loggedInUser
+
+    const {oldPassword , newPassword} = req.body;
+
+    if(oldPassword === newPassword) return res.status(400).json({message : "new password is the old password change it!!"});
+
+    const user = await User.findById(userId)
+
+    if(!user) return res.status(404).json({message : "user Not Found"}) 
+
+    const isPasswordMatched = compareSync(oldPassword , user.password);
+
+    if(!isPasswordMatched) return res.status(400).json({message : "Invalid Old Password"})
+
+    const hashPassword = hashSync(newPassword , +process.env.SALT_ROUNDS)
+
+    user.password = hashPassword
+
+    await user.save()
+
+    return res.status(200).json({message : "Password Updated successfully"})
+}
