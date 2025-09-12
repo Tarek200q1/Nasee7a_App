@@ -13,7 +13,7 @@ const uniqueString = customAlphabet('jsdgfbugihskdn' , 5)
 
 export const SignUpService = async (req , res)=>{
     
-        const {firstName , lastName , email , password , age , gender , phoneNumber} = req.body;
+        const {firstName , lastName , email , password , age , gender , phoneNumber , role} = req.body;
  
         const isEmailExists = await User.findOne({email});
         if(isEmailExists) return res.status(409).json({message : "Email already exists"});
@@ -41,7 +41,8 @@ export const SignUpService = async (req , res)=>{
             age , 
             gender , 
             phoneNumber:encryptPhoneNumber , 
-            otps:{confirmation: hashSync(otp , +process.env.SALT_ROUNDS)}
+            otps:{confirmation: hashSync(otp , +process.env.SALT_ROUNDS)},
+            role
         });
 
         // Send Email for registered user
@@ -213,7 +214,6 @@ export const DeleteAccountService = async (req, res) => {
     return res.status(200).json({ message: "User deleted successfully", deletedUser });
   
 };
-
 
 
 export const ListUsersService = async (req, res) =>{
