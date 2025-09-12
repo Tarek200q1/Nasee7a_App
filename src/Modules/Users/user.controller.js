@@ -11,7 +11,9 @@ router.post('/register' ,userServices.SignUpService);
 router.post('/signin' , userServices.SignInService);
 router.put('/confirm' , userServices.ConfirmEmailService);
 router.post('/logout' , authenticationMiddleware ,  userServices.LogoutService);
+
 router.post('/refresh-token' , userServices.RefreshTokensService);
+router.post('/forget-password' , userServices.ForgetPasswordService);
 
 // Account Routes
 router.put('/update' , authenticationMiddleware , userServices.UpdateAccountService);

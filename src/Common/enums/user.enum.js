@@ -12,3 +12,11 @@ export const RolesEnum = {
     ADMIN : "admin",
     SUPER_ADMIN : "usper_admin"
 }
+
+
+
+export const ProviderEnum = {
+    LOCAL : "local",
+    GOOGLE : "google",
+    FACEBOOK : "facebook"
+}
