@@ -304,7 +304,7 @@ export const ForgetPasswordService = async (req , res)=>{
 
 
 export const ResetPasswordService = async (req , res)=>{
-    const {email , otp , newPassword}  = req.body;
+    const {email , otp , newPassword , confirmNewPassword}  = req.body;
 
     const user = await User.findOne({email , provider:ProviderEnum.LOCAL})
     
@@ -332,7 +332,7 @@ export const ResetPasswordService = async (req , res)=>{
 export const UpdatePasswordService = async (req , res)=>{
     const {_id : userId} = req.loggedInUser
 
-    const {oldPassword , newPassword} = req.body;
+    const {oldPassword , newPassword , confirmNewPassword} = req.body;
 
     if(oldPassword === newPassword) return res.status(400).json({message : "new password is the old password change it!!"});
 
