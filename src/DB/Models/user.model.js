@@ -14,14 +14,10 @@ const userSchema = new mongoose.Schema(
     lastName: {
       type: String,
       required: true,
-      minLength: [3, "First Name must be at least 3 characters long"],
-      maxLength: [20, "Name must be at least 3 characters long"],
       lowercase: true,
-      trim: true,
     },
     age: {
       type: Number,
-      required: true,
       min: [18, "Age must be at least 18 years old"],
       max: [100, "Age must be at most 100 years old "],
       index: {
@@ -76,7 +72,8 @@ const userSchema = new mongoose.Schema(
       type:String,
       enum:Object.values(ProviderEnum),
       default : ProviderEnum.LOCAL
-    }
+    },
+    googleSub : String
   },
   {
     timestamps: true,

@@ -13,6 +13,7 @@ router.post('/register' , validationMiddleware(SignUpSchema) ,userServices.SignU
 router.post('/signin' , validationMiddleware(SignInSchema) , userServices.SignInService);
 router.put('/confirm' , userServices.ConfirmEmailService);
 router.post('/logout' , authenticationMiddleware ,  userServices.LogoutService);
+router.post('/auth-gmail' , userServices.AuthServiceWithGmail)
 
 router.post('/refresh-token' , userServices.RefreshTokensService);
 router.post('/forget-password' , validationMiddleware(ForgetPasswordSchema) , userServices.ForgetPasswordService);

@@ -9,7 +9,9 @@ import BlackListedTokens from "../../../DB/Models/black-listed-tokens.model.js";
 import mongoose from "mongoose";
 import Messages from "../../../DB/Models/message.model.js";
 import { ProviderEnum } from "../../../Common/enums/user.enum.js";
+import { OAuth2Client } from "google-auth-library";
 const uniqueString = customAlphabet('jsdgfbugihskdn' , 5)
+
 
 
 export const SignUpService = async (req , res)=>{
@@ -351,4 +353,60 @@ export const UpdatePasswordService = async (req , res)=>{
     await user.save()
 
     return res.status(200).json({message : "Password Updated successfully"})
+}
+
+
+export const AuthServiceWithGmail = async (req , res)=>{
+
+    const {idToken} = req.body;
+    const client = new OAuth2Client();
+    const ticket = await client.verifyToken({
+        idToken,
+        audience: process.envWEB_CLIENT_ID
+    });
+
+    const {email , given_name , family_name , email_verified , sub} = ticket.getPayload()
+    if(!email_verified) return res.status(400).json({message : "Email is not verified"})
+
+    const isUserExist = await User.findOne({googleSub:sub , provider:ProviderEnum.GOOGLE});
+    let newUser ;
+    if(!isUserExist){
+        newUser = await User.create({
+            firstName:given_name,
+            lastName:family_name,
+            email,
+            provider:ProviderEnum.GOOGLE,
+            isConfirmed:true,
+            password:hashSync(uniqueString() , +process.env.SALT_ROUNDS),
+            googleSub:sub
+        })
+    }else{
+        newUser = isUserExist
+        isUserExist.email = email
+        isUserExist.firstName = given_name
+        isUserExist.lastName = family_name || ' '
+        await isUserExist.save()
+    }
+    // Generate token for the loggedIn User
+        const accesstoken = generateToken(
+             {_id:newUser._id , email:newUser.email},
+            process.env.JWT_ACCESS_SECRET,
+            {
+                expiresIn : process.env.JWT_ACCESS_EXPIRES_IN, 
+                jwtid : uuidv4() // will use it to revoke the token
+            }
+        );
+
+
+        // Refresh token
+        const refreshtoken = generateToken(
+             {_id:newUser._id , email:newUser.email},
+            process.env.JWT_REFRESH_SECRET,
+            {
+                
+                expiresIn : process.env.JWT_REFRESH_EXPIRES_IN, 
+                jwtid : uuidv4()// will use it to revoke the token
+            }
+        )
+    res.status(200).json({message : "User signed up successfully" , tokens:{accesstoken , refreshtoken}})
 }

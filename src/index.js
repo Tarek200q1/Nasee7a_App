@@ -3,11 +3,28 @@ import express from "express";
 import userRouter from "./Modules/Users/user.controller.js"
 import messageRouter from "./Modules/Messages/message.controller.js"
 import dbConnection from "./DB/db.connection.js";
+import cors from 'cors'
 const app = express();
 
 
 //Barsing Middleware
 app.use(express.json());
+
+
+const whitelist = process.env.WHITE_LISTED_ORIGINS ;
+const corsOption = {
+    origin: function(origin , callback) {
+      console.log(`The current is` , origin);
+      
+      if(whitelist.includes(origin)){
+        callback(null , true)
+      }else{
+        callback(new Error('Not allowed by CORS'))
+      }
+    }
+}
+
+app.use(cors(corsOption));
 
 //Handle routes
 app.use("/api/users", userRouter);
