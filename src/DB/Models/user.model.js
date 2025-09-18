@@ -110,4 +110,4 @@ userSchema.virtual("Messages" , {
 //User Model
 const User = mongoose.model("User", userSchema);
 
-export default User;
+export {User};

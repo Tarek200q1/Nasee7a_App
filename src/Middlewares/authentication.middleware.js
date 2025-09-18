@@ -1,5 +1,4 @@
-import BlackListedTokens from "../DB/Models/black-listed-tokens.model.js";
-import User from "../DB/Models/user.model.js";
+import {BlackListedTokens , User} from "../DB/Models/index.js";
 import { verifyToken } from "../Utils/tokens.utils.js";
 
 
