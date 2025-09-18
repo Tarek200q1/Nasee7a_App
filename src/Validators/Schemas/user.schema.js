@@ -1,6 +1,6 @@
 import Joi from "joi";
-import { GenderEnum, RolesEnum } from "../../Common/enums/user.enum.js";
-import { generalRules } from "../../Utils/general-rules.utils.js";
+import { GenderEnum, RolesEnum } from "../../Common/enums/index.js";
+import { generalRules } from "../../Utils/index.js";
 
  
 
