@@ -11,21 +11,9 @@ function checkOrCreateFolder(folderPath){
 }
 
 
-export const localUpload = ({
-    folderPath = 'samples'
-})=>{
-    const storage = multer.diskStorage({
-        destination: (req, file , cb)=>{
-            const fileDir = `uploads/${folderPath}`
-            checkOrCreateFolder(fileDir)
-            cb(null , fileDir)
-        },
-        filename: (req , file , cb)=>{
-            console.log(`file info before uploading ${file}`);
-            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-            cb(null , `${uniqueSuffix}__${file.originalname}`)
-        }
-    })
+// Upload Host
+export const hostUpload = ()=>{
+    const storage = multer.diskStorage({})
 
     const fileFilter = (req , file , cb)=>{
         const fileKey = file.mimetype.split('/')[0].toUpperCase()

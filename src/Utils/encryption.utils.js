@@ -1,11 +1,6 @@
 import crypto, { privateDecrypt } from "node:crypto";
 import fs from "node:fs";
 
-/**
- * create cipher
- * upadte cipher
- * final cipher
- */
 
 const IV_LENGTH = +process.env.IV_LENGTH;
 const ENCRYPTION_SECRET_KEY = Buffer.from(process.env.ENCRYPTION_SECRET_KEY );
