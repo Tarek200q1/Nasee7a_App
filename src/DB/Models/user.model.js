@@ -40,13 +40,6 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       requierd: true,
-
-
-      //Setters
-      // set(value) {
-      //   const randomValue = Math.random();
-      //   return `${value}____${randomValue}`;
-      // },
     },
     phoneNumber : {
       type:String,
@@ -74,7 +67,11 @@ const userSchema = new mongoose.Schema(
       default : ProviderEnum.LOCAL
     },
     googleSub : String,
-    profilePicture:String
+    profilePicture:{
+      secure_url:String,
+      public_id:String
+    },
+    devices: [String]
   },
   {
     timestamps: true,
@@ -83,7 +80,6 @@ const userSchema = new mongoose.Schema(
     },
     virtuals: {
       fullName: {
-        // Getters
         get() {
           return `${this.firstName} ${this.lastName}`;
         },

@@ -7,6 +7,7 @@ import { emitter, asymmetricEncryption , generateToken, verifyToken  } from "../
 import { ProviderEnum } from "../../../Common/enums/index.js";
 import { User  , BlackListedTokens} from "../../../DB/Models/index.js";
 import { json } from "express";
+import { UploadFileOnCloudinary } from "../../../Common/Services/cloudinary.service.js";
 
 const uniqueString = customAlphabet('jsdgfbugihskdn' , 5)
 
@@ -24,8 +25,6 @@ export const SignUpService = async (req , res)=>{
 
 
         // Encrypt phone
-
-        // const encryptPhoneNumber = encrypt(phoneNumber)
         const encryptPhoneNumber = asymmetricEncryption(phoneNumber)
 
 
@@ -45,18 +44,6 @@ export const SignUpService = async (req , res)=>{
             otps:{confirmation: hashSync(otp , +process.env.SALT_ROUNDS)},
             role
         });
-
-        // Send Email for registered user
-        // await sendEmail({
-        //     to : email,
-        //     subject : 'Confirmation Email',
-        //     content : 
-        //     `
-        //         Your confirmation OTP is ${otp}
-        //     `,
-           
-        // })
-
 
         emitter.emit('sendEmail' , {
             to : email,
@@ -107,14 +94,22 @@ export const SignInService = async (req , res)=>{
              return res.status(404).json({message : "Invalid email or password"})
         }
 
+         const device = req.headers["user-agent"]; 
+             if (!user.devices) user.devices = [];
+             if (!user.devices.includes(device)) {
+             if (user.devices.length >= 2) {
+              return res.status(403).json({ message: "You can login from 2 devices only" });
+    }
+     user.devices.push(device);
+     await user.save();
+  }
+
         // Generate token for the loggedIn User
         const accesstoken = generateToken(
              {_id:user._id , email:user.email},
             process.env.JWT_ACCESS_SECRET,
             {
-                // issuer : "http://localhost:3000",
-                // audience : "http://localhost:4000",
-                expiresIn : process.env.JWT_ACCESS_EXPIRES_IN, // will use it to revoke the token
+                expiresIn : process.env.JWT_ACCESS_EXPIRES_IN, 
                 jwtid : uuidv4()
             }
         );
@@ -163,7 +158,7 @@ export const RefreshTokensService = async (req , res)=>{
             process.env.JWT_ACCESS_SECRET,
             {
                 expiresIn : process.env.JWT_ACCESS_EXPIRES_IN, 
-                jwtid : uuidv4() // will use it to revoke the token
+                jwtid : uuidv4() 
             }
         );
 
@@ -287,7 +282,7 @@ export const AuthServiceWithGmail = async (req , res)=>{
             process.env.JWT_ACCESS_SECRET,
             {
                 expiresIn : process.env.JWT_ACCESS_EXPIRES_IN, 
-                jwtid : uuidv4() // will use it to revoke the token
+                jwtid : uuidv4()
             }
         );
 
@@ -299,7 +294,7 @@ export const AuthServiceWithGmail = async (req , res)=>{
             {
                 
                 expiresIn : process.env.JWT_REFRESH_EXPIRES_IN, 
-                jwtid : uuidv4()// will use it to revoke the token
+                jwtid : uuidv4()
             }
         )
     res.status(200).json({message : "User signed up successfully" , tokens:{accesstoken , refreshtoken}})
@@ -308,10 +303,21 @@ export const AuthServiceWithGmail = async (req , res)=>{
 
 export const UploadProfileService = async(req, res)=>{
 
-    const {user:{_id}} = req.loggedInUser
+    const {_id} = req.loggedInUser
     const {path} = req.file
 
-    const user = await User.findByIdAndUpdate(_id,{profilePicture:path} , {new:true})
+    const {secure_url , public_id} = await UploadFileOnCloudinary(
+        path,
+        {
+            folder: 'Nasse7a_App/Users/Profiles',
+            resource_type: 'image'
+        }
+    )
+
+    const user = await User.findByIdAndUpdate(_id,{profilePicture:{
+        secure_url,
+        public_id
+    }} , {new:true})
 
     return res.status(200).json({message : "profile uploaded successfully" , user})
 }

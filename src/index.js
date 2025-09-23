@@ -9,20 +9,21 @@ import dbConnection from "./DB/db.connection.js";
 
 import { limiter } from './Middlewares/index.js';
 
+import "./cron-jobs/tokenCleanup.job.js"
 
 const app = express();
 
 
 //Barsing Middleware
 app.use(express.json());
-app.use('/uploads' , express.static('/uploads '))
+app.use('/uploads' , express.static('/uploads'))
 
 
 const whitelist = process.env.WHITE_LISTED_ORIGINS ;
 const corsOption = {
     origin: function(origin , callback) {
       
-      if(whitelist.includes(origin)){
+      if(!origin || whitelist.includes(origin)){
         callback(null , true)
       }else{
         callback(new Error('Not allowed by CORS'))
@@ -53,7 +54,7 @@ app.use(async(err , req , res , next) => {
         await req.session.abortTransaction();
         // end session
         session.endSession();
-            console.log("The transaction is aborted", error);
+            console.log("The transaction is aborted", err);
     }
     res.status(err.cause || 500).json({message : "something broke!" , err:err.message , stack: err.stack})
 });

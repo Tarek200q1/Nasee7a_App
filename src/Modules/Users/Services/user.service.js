@@ -1,3 +1,4 @@
+import { DeleteFileFromCloudinary } from "../../../Common/Services/cloudinary.service.js";
 import { User , Messages } from "../../../DB/Models/index.js";
 import fs from 'node:fs'
 
@@ -19,38 +20,6 @@ export const UpdateAccountService = async(req , res)=>{
         
          return res.status(200).json({message : "User updated successfully" })
         
-
-        // find user by userId (findById)
-
-        // const user = await User.findById(userId);
-        // if(!user){
-        //     return res.status(404).json({message : "User not found"});
-        // }
-        // if(firstName) user.firstName = firstName;
-        // if(lastName) user.lastName = lastName;
-        // if(email){
-        //      const isEmailExists = await User.findOne({email});
-        //      if(isEmailExists) return res.status(409).json({message : "Email already exists"});
-
-        //      user.email = email;
-        // }
-        // if(age) user.age = age;
-        // if(gender) user.gender = gender;
-
-        // await user.save()
-
-
-
- 
-        // update by (updateOne)
-        
-        // const updatedResult = await User.updateOne({_id:userId} ,{firstName , lastName , email , age , gender} )
-        // const chek = updatedResult.modifiedCount===0;
-        // if(chek) return res.status(404).json({message : "user not Found"})
-
-
-        // return res.status(200).json({message : "User updated successfully" , decodedData})
-   
 };
 
 
@@ -69,8 +38,11 @@ export const DeleteAccountService = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // unlink profile picture
+    // unlink profile picture (locally)
     fs.unlinkSync(deletedUser.profilePicture)
+
+    // delete by public id
+    await DeleteFileFromCloudinary(deletedUser.profilePicture.public_id)
 
     // delete user messages
     await Messages.deleteMany({ receiverId: _id }, { session });
@@ -90,23 +62,6 @@ export const DeleteAccountService = async (req, res) => {
 export const ListUsersService = async (req, res) =>{
     let users = await User.find().populate("Messages").select("firstName lastName age gender email phoneNumber")
 
-    // users = users.map((user) => {
-    //     let phone = user.phoneNumber;
-
-    //     if (phone && typeof phone === "string" && phone.includes(":")) {
-    //         try {
-    //             phone = asymmetricDecryption(phone);
-    //         } catch (err) {
-    //             console.error("Error decrypting phoneNumber:", err.message);
-    //         }
-    //     }
-
-    //     return {
-    //         ...user._doc,
-    //         phoneNumber: phone
-    //     };
-    // });
-    
     return res.status(200).json({ users });
 };
 
