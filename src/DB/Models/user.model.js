@@ -73,7 +73,8 @@ const userSchema = new mongoose.Schema(
       enum:Object.values(ProviderEnum),
       default : ProviderEnum.LOCAL
     },
-    googleSub : String
+    googleSub : String,
+    profilePicture:String
   },
   {
     timestamps: true,

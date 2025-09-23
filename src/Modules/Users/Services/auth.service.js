@@ -261,12 +261,13 @@ export const AuthServiceWithGmail = async (req , res)=>{
     const {email , given_name , family_name , email_verified , sub} = ticket.getPayload()
     if(!email_verified) return res.status(400).json({message : "Email is not verified"})
 
+    // find user with email and provider from out database
     const isUserExist = await User.findOne({googleSub:sub , provider:ProviderEnum.GOOGLE});
     let newUser ;
     if(!isUserExist){
         newUser = await User.create({
             firstName:given_name,
-            lastName:family_name,
+            lastName:family_name || ' ',
             email,
             provider:ProviderEnum.GOOGLE,
             isConfirmed:true,
@@ -305,6 +306,15 @@ export const AuthServiceWithGmail = async (req , res)=>{
 }   
 
 
+export const UploadProfileService = async(req, res)=>{
+
+    const {user:{_id}} = req.loggedInUser
+    const {path} = req.file
+
+    const user = await User.findByIdAndUpdate(_id,{profilePicture:path} , {new:true})
+
+    return res.status(200).json({message : "profile uploaded successfully" , user})
+}
 
 
 

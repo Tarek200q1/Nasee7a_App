@@ -1,6 +1,6 @@
 import 'dotenv/config'
 import express from "express";
-// import cors from 'cors'
+import cors from 'cors'
 import helmet from 'helmet';
 
 import * as Controller from "./Modules/controller.index.js"
@@ -15,23 +15,23 @@ const app = express();
 
 //Barsing Middleware
 app.use(express.json());
+app.use('/uploads' , express.static('/uploads '))
 
 
-// const whitelist = process.env.WHITE_LISTED_ORIGINS ;
-// const corsOption = {
-//     origin: function(origin , callback) {
-//       console.log(`The current is` , origin);
+const whitelist = process.env.WHITE_LISTED_ORIGINS ;
+const corsOption = {
+    origin: function(origin , callback) {
       
-//       if(whitelist.includes(origin)){
-//         callback(null , true)
-//       }else{
-//         callback(new Error('Not allowed by CORS'))
-//       }
-//     }
-// }
+      if(whitelist.includes(origin)){
+        callback(null , true)
+      }else{
+        callback(new Error('Not allowed by CORS'))
+      }
+    }
+}
 
-// app.use(cors(corsOption));
-app.use(helmet())
+// use some security middlewares
+app.use(cors(corsOption) , helmet());
 
 
 app.use(limiter)
