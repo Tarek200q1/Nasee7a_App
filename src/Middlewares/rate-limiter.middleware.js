@@ -12,6 +12,7 @@ export const limiter = rateLimit({
   } ,
   requestPropertyName : 'rate_limit',
   statusCode : 429,
+  legacyHeaders:false,
   message: 'To many requests from this IP , please try again after 15 minutes',
   keyGenerator: (req)=>{
     const ip = ipKeyGenerator(req.headers['x-forwarded-for']);
@@ -22,4 +23,4 @@ export const limiter = rateLimit({
     collectionName : "rateLimiter",
     expireTimeMs: 5 * 60 * 1000,
   })
-})
+});

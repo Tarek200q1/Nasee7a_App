@@ -1,4 +1,5 @@
 import { User , Messages } from "../../../DB/Models/index.js";
+import fs from 'node:fs'
 
 
 export const UpdateAccountService = async(req , res)=>{
@@ -68,6 +69,10 @@ export const DeleteAccountService = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // unlink profile picture
+    fs.unlinkSync(deletedUser.profilePicture)
+
+    // delete user messages
     await Messages.deleteMany({ receiverId: _id }, { session });
 
     // commit transaction
