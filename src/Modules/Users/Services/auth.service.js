@@ -94,6 +94,16 @@ export const SignInService = async (req , res)=>{
              return res.status(404).json({message : "Invalid email or password"})
         }
 
+         const device = req.headers["user-agent"]; 
+             if (!user.devices) user.devices = [];
+             if (!user.devices.includes(device)) {
+             if (user.devices.length >= 2) {
+              return res.status(403).json({ message: "You can login from 2 devices only" });
+    }
+     user.devices.push(device);
+     await user.save();
+  }
+
         // Generate token for the loggedIn User
         const accesstoken = generateToken(
              {_id:user._id , email:user.email},

@@ -70,7 +70,8 @@ const userSchema = new mongoose.Schema(
     profilePicture:{
       secure_url:String,
       public_id:String
-    }
+    },
+    devices: [String]
   },
   {
     timestamps: true,
