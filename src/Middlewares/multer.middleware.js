@@ -1,19 +1,11 @@
 import multer from "multer"
-import fs from "node:fs"
 import { allowedFileExtensions, fileTypes } from "../Common/constants/files.constants.js"
 
 
 
-function checkOrCreateFolder(folderPath){
-    if(!fs.existsSync(folderPath)){
-        fs.mkdirSync(folderPath , {recursive:true})
-    }
-}
-
-
 // Upload Host
 export const hostUpload = ()=>{
-    const storage = multer.diskStorage({})
+    const storage = multer.memoryStorage({})
 
     const fileFilter = (req , file , cb)=>{
         const fileKey = file.mimetype.split('/')[0].toUpperCase()
