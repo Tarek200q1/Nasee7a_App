@@ -6,11 +6,10 @@ import { OAuth2Client } from "google-auth-library";
 import { emitter, asymmetricEncryption , generateToken, verifyToken  } from "../../../Utils/index.js";
 import { ProviderEnum } from "../../../Common/enums/index.js";
 import { User  , BlackListedTokens} from "../../../DB/Models/index.js";
-import { json } from "express";
+import { json } from "express"; /** @comment : remove all unsed imports */
 import { UploadFileOnCloudinary } from "../../../Common/Services/cloudinary.service.js";
 
 const uniqueString = customAlphabet('jsdgfbugihskdn' , 5)
-
 
 
 export const SignUpService = async (req , res)=>{
@@ -51,8 +50,7 @@ export const SignUpService = async (req , res)=>{
             content : 
             `
                 Your confirmation OTP is ${otp}
-            `,
-           
+            `
         })
         return res.status(201).json({message : "User created successfully" , user})
  
@@ -94,19 +92,19 @@ export const SignInService = async (req , res)=>{
              return res.status(404).json({message : "Invalid email or password"})
         }
 
-         const device = req.headers["user-agent"]; 
-             if (!user.devices) user.devices = [];
-             if (!user.devices.includes(device)) {
-             if (user.devices.length >= 2) {
-              return res.status(403).json({ message: "You can login from 2 devices only" });
-    }
-     user.devices.push(device);
-     await user.save();
-  }
+        const device = req.headers["user-agent"]; 
+        if (!user.devices) user.devices = [];
+        if (!user.devices.includes(device)) {
+            if (user.devices.length >= 2) {
+                return res.status(403).json({ message: "You can login from 2 devices only" });
+            }
+            user.devices.push(device);
+            await user.save();
+        }
 
         // Generate token for the loggedIn User
         const accesstoken = generateToken(
-             {_id:user._id , email:user.email},
+            {_id:user._id , email:user.email},
             process.env.JWT_ACCESS_SECRET,
             {
                 expiresIn : process.env.JWT_ACCESS_EXPIRES_IN, 
@@ -117,7 +115,7 @@ export const SignInService = async (req , res)=>{
 
         // Refresh token
         const refreshtoken = generateToken(
-             {_id:user._id , email:user.email},
+            {_id:user._id , email:user.email},
             process.env.JWT_REFRESH_SECRET,
             {
                 
@@ -131,11 +129,10 @@ export const SignInService = async (req , res)=>{
 };
 
 
+/** @comment : We need to revoke the refresh token also when logging out */
 export const LogoutService = async (req , res)=>{
    
     const {token:{tokenId , expirationDate} , user:{_id}} = req.loggedInUser
-
-
 
     await BlackListedTokens.create({
         tokenId,
@@ -148,6 +145,7 @@ export const LogoutService = async (req , res)=>{
 
 
 export const RefreshTokensService = async (req , res)=>{
+    /** @comment : it's better create a middleware to verify the refresh token because you will need it also in the logout service */
     const {refreshtoken} = req.headers
 
     const decodedData = verifyToken(refreshtoken , process.env.JWT_REFRESH_SECRET)
@@ -175,9 +173,10 @@ export const ForgetPasswordService = async (req , res)=>{
 
     const otp = uniqueString();
 
-    const otpEpired = Date.now() + 60 * 60 * 1000;
+    const otpEpired = Date.now() + 60 * 60 * 1000; // otpExpired
 
-    user.otps.resetPassword = {
+    // What if the otps not returned from the database with the user document
+    user.otps?.resetPassword = {
         code : hashSync(otp , +process.env.SALT_ROUNDS),
         expiresAt : otpEpired
     }
@@ -194,10 +193,10 @@ export const ForgetPasswordService = async (req , res)=>{
 
 
 export const ResetPasswordService = async (req , res)=>{
-    const {email , otp , newPassword , confirmNewPassword}  = req.body;
+    /** @comment : remove the confirmNewPassword because it's not used */
+    const {email , otp , newPassword , confirmNewPassword}  = req.body; 
 
     const user = await User.findOne({email , provider:ProviderEnum.LOCAL})
-    
     if(!user) return res.status(404).json({message : "User Not Foun"})
 
     if(!user.otps?.resetPassword?.code)  return res.status(400).json({message : "OTP Not Foun"})
@@ -219,6 +218,7 @@ export const ResetPasswordService = async (req , res)=>{
 }
 
 
+/** @comment : in this api we need to make the user re-login after updating the password so we need to revoke his access token and refresh token */
 export const UpdatePasswordService = async (req , res)=>{
     const {_id : userId} = req.loggedInUser
 
@@ -278,7 +278,7 @@ export const AuthServiceWithGmail = async (req , res)=>{
     }
     // Generate token for the loggedIn User
         const accesstoken = generateToken(
-             {_id:newUser._id , email:newUser.email},
+            {_id:newUser._id , email:newUser.email},
             process.env.JWT_ACCESS_SECRET,
             {
                 expiresIn : process.env.JWT_ACCESS_EXPIRES_IN, 
@@ -286,10 +286,9 @@ export const AuthServiceWithGmail = async (req , res)=>{
             }
         );
 
-
         // Refresh token
         const refreshtoken = generateToken(
-             {_id:newUser._id , email:newUser.email},
+            {_id:newUser._id , email:newUser.email},
             process.env.JWT_REFRESH_SECRET,
             {
                 
@@ -301,6 +300,7 @@ export const AuthServiceWithGmail = async (req , res)=>{
 }   
 
 
+/** @comment : Upload profile picture should be moved to user.service.js */
 export const UploadProfileService = async(req, res)=>{
 
     const {_id} = req.loggedInUser

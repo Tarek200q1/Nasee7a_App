@@ -6,19 +6,25 @@ import fs from 'node:fs'
 export const UpdateAccountService = async(req , res)=>{
     
 
-        const {_id} = req.loggedInUser
-        const {firstName , lastName , email , age , gender} = req.body;
+    const {_id} = req.loggedInUser
+    const {firstName , lastName , email , age , gender} = req.body;
 
-        // find user by userId
-        const user = await User.findByIdAndUpdate(
-            _id,
-            {firstName , lastName , email , age , gender},
-            {new:true}
-        )
+    // What if the user enter an new email and it's already exists in the database
+    if(email){
+        const isEmailExists = await User.findOne({email})
+        if(isEmailExists) return res.status(409).json({message : "Email already exists"})
+    }
 
-        if(!user) return res.status(404).json({message : "User not found"})
-        
-         return res.status(200).json({message : "User updated successfully" })
+    // find user by userId
+    const user = await User.findByIdAndUpdate(
+        _id,
+        {firstName , lastName , email , age , gender},
+        {new:true}
+    )
+
+    if(!user) return res.status(404).json({message : "User not found"})
+    
+    return res.status(200).json({message : "User updated successfully" })
         
 };
 
@@ -54,7 +60,7 @@ export const DeleteAccountService = async (req, res) => {
     session.endSession();
     console.log("The transaction is committed");
 
-    return res.status(200).json({ message: "User deleted successfully", deletedUser });
+    return res.status(200).json({ message: "User deleted successfully", deletedUser }); // why we return deletedUser in the response
   
 };
 

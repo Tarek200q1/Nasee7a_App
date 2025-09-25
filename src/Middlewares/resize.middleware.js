@@ -2,7 +2,7 @@ import sharp from "sharp";
 import path from "path";
 
 
-
+/** @comment : 🚀👌 Interesting  */
 export const resizeImageMiddleware = async (req, res, next) => {
   if (!req.file) return next();
 

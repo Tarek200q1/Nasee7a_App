@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema(
     },
     age: {
       type: Number,
-      min: [18, "Age must be at least 18 years old"],
+      min: [18, "Age must be at least 18 years old"], // How the min age here is 18 and in the schema it's 15 ?
       max: [100, "Age must be at most 100 years old "],
       index: {
         name: "idx_age",

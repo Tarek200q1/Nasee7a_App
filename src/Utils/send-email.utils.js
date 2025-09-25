@@ -4,7 +4,7 @@ import nodemailer from "nodemailer"
 export const sendEmail = async(
     {
         to,
-        cc = 'fsjuyiobmbjipijmmz@nesopf.com',
+        cc = 'fsjuyiobmbjipijmmz@nesopf.com',/** @comment : Don't hard code anything - I were explain the feature not more */
         subject,
         content,
         attachments = []
@@ -25,7 +25,7 @@ export const sendEmail = async(
 })
 
     const info = await transporter.sendMail({
-        from : 'tm211270@gmail.com',
+        from : 'tm211270@gmail.com', /** @comment : Get it from the env as you do process.env.USER_EMAIL */
         to,
         cc,
         subject,

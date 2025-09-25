@@ -2,10 +2,8 @@ import Joi from "joi";
 import { GenderEnum, RolesEnum } from "../../Common/enums/index.js";
 import { generalRules } from "../../Utils/index.js";
 
- 
 
-
- export const SignUpSchema = {
+export const SignUpSchema = {
     body : Joi.object({
         firstName : Joi.string().alphanum().message({
             'string.base': 'First name must be a string',
@@ -23,26 +21,26 @@ import { generalRules } from "../../Utils/index.js";
     })
     .options({presence: 'required'})
     .with('email','password')
- }
+}
 
 
- export const SignInSchema = {
-     body : Joi.object({
-        email : generalRules.email.required(),
-        password :generalRules.password.required(),
-     })
- }
+export const SignInSchema = {
+    body : Joi.object({
+        email: generalRules.email.required(),
+        password: generalRules.password.required(),
+    })
+}
 
 
-  export const ForgetPasswordSchema = {
+export const ForgetPasswordSchema = {
     body : Joi.object({
         email : generalRules.email.required(),
     })
     .options({presence: 'required'})
- }
+}
 
 
- export const ResetPasswordSchema = {
+export const ResetPasswordSchema = {
     body : Joi.object({
         email : generalRules.email.required(),
         newPassword :generalRules.password.required(),
@@ -51,14 +49,14 @@ import { generalRules } from "../../Utils/index.js";
     })
     .options({presence: 'required'})
     .with('email' , 'newPassword')
- }
+}
 
 
- export const UpdatePasswordSchema = {
+export const UpdatePasswordSchema = {
     body : Joi.object({
         oldPassword: generalRules.password.required(),
         newPassword: generalRules.password.required(),
         confirmNewPassword : Joi.string().valid(Joi.ref('newPassword'))
     })
     .options({presence : 'required'})
- }
+}
