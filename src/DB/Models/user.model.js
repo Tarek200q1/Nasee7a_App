@@ -41,18 +41,18 @@ const userSchema = new mongoose.Schema(
       type: String,
       requierd: true,
     },
-    phoneNumber : {
+    phoneNumber: {
       type:String,
       requierd : true
     },
-    otps : {
+    otps: {
       confirmation : String,
       resetPassword : {
         code :  String,
         expiresAt : Date
       },
     },
-    isConfirmed : {
+    isConfirmed: {
       type : Boolean,
       default : false
     },
@@ -61,12 +61,12 @@ const userSchema = new mongoose.Schema(
       enum:Object.values(RolesEnum),
       default:RolesEnum.USER
     },
-    provider : {
+    provider: {
       type:String,
       enum:Object.values(ProviderEnum),
       default : ProviderEnum.LOCAL
     },
-    googleSub : String,
+    googleSub: String,
     profilePicture:{
       secure_url:String,
       public_id:String
@@ -75,7 +75,7 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-    toJSON : {
+    toJSON: {
       virtuals: true
     },
     virtuals: {

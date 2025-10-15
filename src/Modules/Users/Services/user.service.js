@@ -1,4 +1,4 @@
-import { DeleteFileFromCloudinary } from "../../../Common/Services/cloudinary.service.js";
+import { DeleteFileFromCloudinary, UploadFileOnCloudinary } from "../../../Common/Services/cloudinary.service.js";
 import { User , Messages } from "../../../DB/Models/index.js";
 import fs from 'node:fs'
 
@@ -6,6 +6,7 @@ import fs from 'node:fs'
 export const UpdateAccountService = async(req , res)=>{
     
 
+<<<<<<< Updated upstream
     const {_id} = req.loggedInUser
     const {firstName , lastName , email , age , gender} = req.body;
 
@@ -25,9 +26,27 @@ export const UpdateAccountService = async(req , res)=>{
     if(!user) return res.status(404).json({message : "User not found"})
     
     return res.status(200).json({message : "User updated successfully" })
+=======
+      const {_id} = req.loggedInUser
+      const {firstName , lastName , email , age , gender} = req.body;
+
+        // find user by userId
+      const user = await User.findByIdAndUpdate(
+            _id,
+            {firstName , lastName , email , age , gender},
+            {new:true}
+        )
+
+      if(!user) return res.status(404).json({message : "User not found"})
+      
+      if(email){
+        const isEmailExists = await User.findOne({email})
+        if(isEmailExists) return res.status(409).json({message : "Email already exists"})
+      }
+      return res.status(200).json({message : "User updated successfully" })
+>>>>>>> Stashed changes
         
 };
-
 
 export const DeleteAccountService = async (req, res) => {
   // start session
@@ -58,17 +77,45 @@ export const DeleteAccountService = async (req, res) => {
 
     // end sessionnode
     session.endSession();
-    console.log("The transaction is committed");
 
+<<<<<<< Updated upstream
     return res.status(200).json({ message: "User deleted successfully", deletedUser }); // why we return deletedUser in the response
+=======
+    return res.status(200).json({ message: "User deleted successfully" });
+>>>>>>> Stashed changes
   
 };
 
-// List users
 export const ListUsersService = async (req, res) =>{
     let users = await User.find().populate("Messages").select("firstName lastName age gender email phoneNumber")
 
     return res.status(200).json({ users });
 };
+
+export const UploadProfileService = async (req, res) => {
+  const { _id } = req.loggedInUser;
+  const { path } = req.file;
+
+  const { secure_url, public_id } = await UploadFileOnCloudinary(path, {
+    folder: "Nasse7a_App/Users/Profiles",
+    resource_type: "image",
+  });
+
+  const user = await User.findByIdAndUpdate(
+    _id,
+    {
+      profilePicture: {
+        secure_url,
+        public_id,
+      },
+    },
+    { new: true }
+  );
+
+  return res
+    .status(200)
+    .json({ message: "profile uploaded successfully", user });
+};
+
 
 

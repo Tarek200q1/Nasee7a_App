@@ -1,22 +1,22 @@
 
 
 export const GenderEnum = {
-    FEMALE : "female",
-    MALE : "male"
+    FEMALE: "female",
+    MALE: "male"
 }
 
 
 
 export const RolesEnum = {
-    USER : "user",
+    USER: "user",
     ADMIN : "admin",
-    SUPER_ADMIN : "usper_admin"
+    SUPER_ADMIN: "usper_admin"
 }
 
 
 
 export const ProviderEnum = {
-    LOCAL : "local",
-    GOOGLE : "google",
-    FACEBOOK : "facebook"
+    LOCAL: "local",
+    GOOGLE: "google",
+    FACEBOOK: "facebook"
 }

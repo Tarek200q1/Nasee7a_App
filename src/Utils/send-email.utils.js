@@ -4,7 +4,11 @@ import nodemailer from "nodemailer"
 export const sendEmail = async(
     {
         to,
+<<<<<<< Updated upstream
         cc = 'fsjuyiobmbjipijmmz@nesopf.com',/** @comment : Don't hard code anything - I were explain the feature not more */
+=======
+        cc = process.env.SEND_EMAIL_CC,
+>>>>>>> Stashed changes
         subject,
         content,
         attachments = []
@@ -12,7 +16,7 @@ export const sendEmail = async(
 )=>{
 
     const transporter =  nodemailer.createTransport({
-    host:'smtp.gmail.com',
+    host: process.env.TRANSPORT_HOST,
     port:465,
     secure : true,
     auth :{
@@ -25,7 +29,11 @@ export const sendEmail = async(
 })
 
     const info = await transporter.sendMail({
+<<<<<<< Updated upstream
         from : 'tm211270@gmail.com', /** @comment : Get it from the env as you do process.env.USER_EMAIL */
+=======
+        from : process.env.SEND_EMAIL_FROM,
+>>>>>>> Stashed changes
         to,
         cc,
         subject,
@@ -33,10 +41,6 @@ export const sendEmail = async(
         attachments
 
     })
-
-    console.log(info);
-    
-
 
     return info
 }
@@ -48,8 +52,5 @@ export const emitter = new EventEmitter();
 
 
 emitter.on('sendEmail' , (args)=>{
-    console.log(`The sending Email event is started`);
-
     sendEmail(args)
-    
 })

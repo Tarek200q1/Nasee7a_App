@@ -10,7 +10,7 @@ export const hostUpload = ()=>{
     const fileFilter = (req , file , cb)=>{
         const fileKey = file.mimetype.split('/')[0].toUpperCase()
         const fileType = fileTypes[fileKey]
-        if(!fileType) return cb(new Error('Invalid file type') , false)
+        if(!fileType) return cb(new Error('Invalid file type'), false)
 
         const fileExtension = file.mimetype.split('/')[1]
         if(!allowedFileExtensions[fileType].includes(fileExtension)) return cb(new Error('Invalid file extension') , false)
