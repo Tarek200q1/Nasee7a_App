@@ -9,7 +9,7 @@ const dbConnection = async()=>{
         
     } catch (error) {
 
-        console.log("Database failing to connect" , error);
+        console.log("Database failing to connect", error);
     }
 }
 

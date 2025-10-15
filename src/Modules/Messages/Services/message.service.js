@@ -17,12 +17,17 @@ export const sendMessageService = async (req, res) => {
   const user = await User.findById(receiverId);
   if (!user) return res.status(404).json({ message: "User not found" });
 
+<<<<<<< Updated upstream
   //Create the message
+=======
+   //Create the message
+>>>>>>> Stashed changes
   const message = new Messages({
     content,
     receiverId,
     isPublic
   });
+
   await message.save();
 
   /** @comment : take care from the spaces  */
@@ -47,7 +52,12 @@ export const getMessagesService = async (req, res) => {
     const message = await Messages.find({ receiverId: _id })
         .populate([
             {
+<<<<<<< Updated upstream
                 path: "receiverId"  /** @comment : it's better to select here the desired fields to avoid lake of security */
+=======
+                path: "receiverId",
+                select: "firstName lastName email"
+>>>>>>> Stashed changes
             }
         ])
     if (!message.length) {
@@ -57,6 +67,7 @@ export const getMessagesService = async (req, res) => {
     return res.status(201).json({ message })
 }
 
+<<<<<<< Updated upstream
 /**
  * ===================================
  * @API /messages/get-all-public-message
@@ -64,6 +75,9 @@ export const getMessagesService = async (req, res) => {
  * @description : Get all public messages
  * 
  */
+=======
+
+>>>>>>> Stashed changes
 export const getAllPublicMessageService = async (req, res) => {
     const publicMessage = await Messages.find({ isPublic: true }).populate("receiverId", "firstName lastName");
     if (!publicMessage) {
