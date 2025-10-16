@@ -4,7 +4,7 @@ import nodemailer from "nodemailer"
 export const sendEmail = async(
     {
         to,
-        cc = 'fsjuyiobmbjipijmmz@nesopf.com',
+        cc = process.env.SEND_EMAIL_CC,
         subject,
         content,
         attachments = []
@@ -12,7 +12,7 @@ export const sendEmail = async(
 )=>{
 
     const transporter =  nodemailer.createTransport({
-    host:'smtp.gmail.com',
+    host: process.env.TRANSPORT_HOST,
     port:465,
     secure : true,
     auth :{
@@ -25,7 +25,7 @@ export const sendEmail = async(
 })
 
     const info = await transporter.sendMail({
-        from : 'tm211270@gmail.com',
+        from: process.env.SEND_EMAIL_FROM,
         to,
         cc,
         subject,
@@ -33,10 +33,6 @@ export const sendEmail = async(
         attachments
 
     })
-
-    console.log(info);
-    
-
 
     return info
 }
@@ -48,8 +44,5 @@ export const emitter = new EventEmitter();
 
 
 emitter.on('sendEmail' , (args)=>{
-    console.log(`The sending Email event is started`);
-
     sendEmail(args)
-    
 })

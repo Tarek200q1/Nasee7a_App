@@ -13,7 +13,7 @@ export const sendMessageService = async (req, res) => {
     isPublic
   });
   await message.save();
-  const statusMessage = message.isPublic?"is message public" : "is message private"
+  const statusMessage = message.isPublic?"is message public": "is message private"
   return res
     .status(200)
     .json({ message: "Message sent successfully" , statusMessage , message });
@@ -25,7 +25,8 @@ export const getMessagesService = async (req, res) => {
     const message = await Messages.find({ receiverId: _id })
         .populate([
             {
-                path: "receiverId"
+                path: "receiverId",
+                select: "firstName lastName email"
             }
         ])
     if (!message.length) {

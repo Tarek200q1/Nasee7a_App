@@ -41,33 +41,33 @@ const userSchema = new mongoose.Schema(
       type: String,
       requierd: true,
     },
-    phoneNumber : {
+    phoneNumber: {
       type:String,
-      requierd : true
+      requierd: true
     },
-    otps : {
-      confirmation : String,
-      resetPassword : {
-        code :  String,
-        expiresAt : Date
+    otps: {
+      confirmation: String,
+      resetPassword: {
+        code:  String,
+        expiresAt: Date
       },
     },
-    isConfirmed : {
-      type : Boolean,
-      default : false
+    isConfirmed: {
+      type: Boolean,
+      default: false
     },
     role:{
       type:String,
       enum:Object.values(RolesEnum),
       default:RolesEnum.USER
     },
-    provider : {
-      type:String,
-      enum:Object.values(ProviderEnum),
-      default : ProviderEnum.LOCAL
+    provider: {
+      type: String,
+      enum: Object.values(ProviderEnum),
+      default: ProviderEnum.LOCAL
     },
-    googleSub : String,
-    profilePicture:{
+    googleSub: String,
+    profilePicture: {
       secure_url:String,
       public_id:String
     },
@@ -75,7 +75,7 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-    toJSON : {
+    toJSON: {
       virtuals: true
     },
     virtuals: {
@@ -99,7 +99,7 @@ userSchema.index(
   { firstName: 1, lastName: 1 },
   { name: "idx_firs_last_unique", unique: true }
 );
-userSchema.virtual("Messages" , {
+userSchema.virtual("Messages", {
   ref:"Messages",
   localField:"_id",
   foreignField:"receiverId"
