@@ -195,11 +195,55 @@ export const ForgetPasswordService = async (req , res)=>{
     }
     await user.save()
 
-    emitter.emit("sendEmail" , {
-        to : user.email,
-        subject : "Reset Your Password",
-        content : `<h1>Your OTP ${otp}</h1>`
-    })
+emitter.emit("sendEmail", {
+  to: user.email,
+  subject: "Reset Your Password",
+  content: `
+    <div style="
+      font-family: Arial, sans-serif; 
+      background-color: #f9f9f9; 
+      padding: 20px; 
+      border-radius: 10px; 
+      max-width: 500px; 
+      margin: auto;
+      border: 1px solid #ddd;
+    ">
+      <h2 style="color: #333; text-align: center;">🔐 Password Reset Request</h2>
+      <p style="color: #555; font-size: 16px;">
+        Hello <strong>${user.firstName || "User"}</strong>,
+      </p>
+      <p style="color: #555; font-size: 16px;">
+        We received a request to reset your password. Please use the OTP below to complete the process:
+      </p>
+
+      <div style="
+        background-color: #007bff; 
+        color: #fff; 
+        font-size: 22px; 
+        text-align: center; 
+        padding: 10px; 
+        border-radius: 8px; 
+        margin: 20px 0;
+      ">
+        <strong>${otp}</strong>
+      </div>
+
+      <p style="color: #777; font-size: 14px; text-align: center;">
+        ⚠️ This OTP will expire in 1 hour for your security.
+      </p>
+
+      <p style="color: #555; font-size: 16px; text-align: center;">
+        If you didn’t request a password reset, please ignore this email.
+      </p>
+
+      <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+      <p style="color: #999; font-size: 13px; text-align: center;">
+        © ${new Date().getFullYear()} Nasee7a App — All rights reserved.
+      </p>
+    </div>
+  `,
+});
+
     
     res.status(200).json({message : "Reset Password OTP IS sent successfully to your Email"})
 }
