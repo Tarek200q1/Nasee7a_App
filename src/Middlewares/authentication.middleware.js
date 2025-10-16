@@ -5,7 +5,7 @@ import { verifyToken } from "../Utils/tokens.utils.js";
 
 
 
-export const authenticationMiddleware = async (req , res , next) => {
+export const authenticationMiddleware = async (req, res, next) => {
 
 
     const {accesstoken} = req.headers

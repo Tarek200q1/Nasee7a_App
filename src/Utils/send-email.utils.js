@@ -4,15 +4,7 @@ import nodemailer from "nodemailer"
 export const sendEmail = async(
     {
         to,
-<<<<<<< HEAD
         cc = process.env.SEND_EMAIL_CC,
-=======
-<<<<<<< Updated upstream
-        cc = 'fsjuyiobmbjipijmmz@nesopf.com',/** @comment : Don't hard code anything - I were explain the feature not more */
-=======
-        cc = process.env.SEND_EMAIL_CC,
->>>>>>> Stashed changes
->>>>>>> master
         subject,
         content,
         attachments = []
@@ -33,15 +25,7 @@ export const sendEmail = async(
 })
 
     const info = await transporter.sendMail({
-<<<<<<< HEAD
-        from: process.env.SEND_EMAIL_FROM,
-=======
-<<<<<<< Updated upstream
-        from : 'tm211270@gmail.com', /** @comment : Get it from the env as you do process.env.USER_EMAIL */
-=======
         from : process.env.SEND_EMAIL_FROM,
->>>>>>> Stashed changes
->>>>>>> master
         to,
         cc,
         subject,
