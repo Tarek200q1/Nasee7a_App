@@ -54,7 +54,7 @@ const userSchema = new mongoose.Schema(
     },
     isConfirmed: {
       type: Boolean,
-      default: false
+      default: false,
       confirmation : String,
       resetPassword : {
         code :  String,
