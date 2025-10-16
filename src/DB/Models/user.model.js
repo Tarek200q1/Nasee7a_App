@@ -42,10 +42,10 @@ const userSchema = new mongoose.Schema(
       requierd: true,
     },
     phoneNumber: {
-      type: String,
+      type:String,
       requierd: true
     },
-    otps : {
+    otps: {
       confirmation: String,
       resetPassword: {
         code:  String,
@@ -55,21 +55,30 @@ const userSchema = new mongoose.Schema(
     isConfirmed: {
       type: Boolean,
       default: false
+      confirmation : String,
+      resetPassword : {
+        code :  String,
+        expiresAt : Date
+      },
+    },
+    isConfirmed: {
+      type : Boolean,
+      default : false
     },
     role: {
       type: String,
       enum: Object.values(RolesEnum),
       default: RolesEnum.USER
     },
-    provider : {
+    provider: {
       type:String,
       enum:Object.values(ProviderEnum),
       default: ProviderEnum.LOCAL
     },
     googleSub: String,
-    profilePicture: {
-      secure_url: String,
-      public_id: String
+    profilePicture:{
+      secure_url:String,
+      public_id:String
     },
     devices: [String]
   },

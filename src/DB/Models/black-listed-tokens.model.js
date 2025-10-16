@@ -4,16 +4,16 @@ import mongoose from "mongoose";
 
 const blackListedTokenSchema = new mongoose.Schema({
     tokenId: {
-        type: String,
-        required: true,
-        unique: true
+        type:String,
+        required:true,
+        unique:true
     },
     expirationDate: {
-        type: Date,
+        type:Date,
         required: true
     }
 });
 
 
-const BlackListedTokens = mongoose.model("BlackListedTokens" , blackListedTokenSchema)
+const BlackListedTokens = mongoose.model("BlackListedTokens", blackListedTokenSchema)
 export {BlackListedTokens}
