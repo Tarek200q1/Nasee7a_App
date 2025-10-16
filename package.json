@@ -4,24 +4,23 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "cross-env NODE_ENV=dev node .",
-    "dev": "cross-env NODE_ENV=dev nodemon ."
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
   },
   "engines": {
-    "node": "22.12.0"
+    "node": "22"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@express-rate-limit/tsconfig": "^1.0.2",
     "axios": "^1.12.2",
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.7.0",
     "cors": "^2.8.5",
-    "cross-env": "^10.0.0",
-    "dotenv": "^17.2.3",
+    "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "express-rate-limit": "^8.1.0",
     "google-auth-library": "^10.3.0",
