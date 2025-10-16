@@ -25,7 +25,8 @@ export const sendEmail = async(
 })
 
     const info = await transporter.sendMail({
-        from : process.env.SEND_EMAIL_FROM, 
+        from : process.env.SEND_EMAIL_FROM,
+        to,
         cc,
         subject,
         html:content,
@@ -44,5 +45,4 @@ export const emitter = new EventEmitter();
 
 emitter.on('sendEmail' , (args)=>{
     sendEmail(args)
-    
 })
