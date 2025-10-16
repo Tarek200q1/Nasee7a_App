@@ -9,6 +9,6 @@ export const authorizationMiddleware = (allowdRoles)=>{
         if(allowdRoles.includes(role)){
             return next()
         }
-        res.status(401).json({message : "Unauthorized"})
+        res.status(401).json({message: "Unauthorized"})
     }
 }

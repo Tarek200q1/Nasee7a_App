@@ -10,8 +10,8 @@ export const limiter = rateLimit({
     if(country_code == "EG") return 30
     return 15
   } ,
-  requestPropertyName : 'rate_limit',
-  statusCode : 429,
+  requestPropertyName: 'rate_limit',
+  statusCode: 429,
   legacyHeaders:false,
   message: 'To many requests from this IP , please try again after 15 minutes',
   keyGenerator: (req)=>{

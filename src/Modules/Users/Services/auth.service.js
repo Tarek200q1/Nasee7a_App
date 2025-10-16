@@ -6,8 +6,6 @@ import { OAuth2Client } from "google-auth-library";
 import { emitter, asymmetricEncryption , generateToken, verifyToken  } from "../../../Utils/index.js";
 import { ProviderEnum } from "../../../Common/enums/index.js";
 import { User  , BlackListedTokens} from "../../../DB/Models/index.js";
-import { json } from "express"; /** @comment : remove all unsed imports */
-import { UploadFileOnCloudinary } from "../../../Common/Services/cloudinary.service.js";
 
 const uniqueString = customAlphabet('jsdgfbugihskdn' , 5)
 
@@ -44,14 +42,32 @@ export const SignUpService = async (req , res)=>{
             role
         });
 
-        emitter.emit('sendEmail' , {
-            to : email,
-            subject : 'Confirmation Email',
-            content : 
-            `
-                Your confirmation OTP is ${otp}
-            `
-        })
+        emitter.emit("sendEmail", {
+        to: email,
+        subject: "✨ Confirmation Email",
+        content: `
+                <div style="font-family: Arial, sans-serif; background-color: #f4f6f8; padding: 30px;">
+                  <div style="max-width: 500px; margin: auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); padding: 30px; text-align: center;">
+                    <h2 style="color: #4A90E2; margin-bottom: 20px;">Confirm Your Email</h2>
+                    <p style="color: #333; font-size: 16px; margin-bottom: 25px;">
+                      Hello 👋, please use the following OTP to confirm your email address:
+                    </p>
+                    <div style="font-size: 28px; font-weight: bold; letter-spacing: 4px; color: #4A90E2; background: #f0f8ff; display: inline-block; padding: 10px 20px; border-radius: 8px;">
+                      ${otp}
+                    </div>
+                    <p style="color: #666; font-size: 14px; margin-top: 25px;">
+                      ⚠️ This code will expire in <strong>1 hour</strong>.
+                    </p>
+                    <hr style="border: none; border-top: 1px solid #eee; margin: 25px 0;">
+                    <p style="font-size: 13px; color: #999;">
+                      Thank you for using <strong>Nasee7a App</strong> ❤️<br>
+                      If you didn’t request this, please ignore this email.
+                    </p>
+                  </div>
+                </div>
+                 `
+});
+
         return res.status(201).json({message : "User created successfully" , user})
  
 };
@@ -119,7 +135,7 @@ export const SignInService = async (req , res)=>{
             process.env.JWT_REFRESH_SECRET,
             {
                 
-                expiresIn : process.env.JWT_REFRESH_EXPIRES_IN, // will use it to revoke the token
+                expiresIn : process.env.JWT_REFRESH_EXPIRES_IN, 
                 jwtid : uuidv4()
             }
         )
@@ -129,7 +145,6 @@ export const SignInService = async (req , res)=>{
 };
 
 
-/** @comment : We need to revoke the refresh token also when logging out */
 export const LogoutService = async (req , res)=>{
    
     const {token:{tokenId , expirationDate} , user:{_id}} = req.loggedInUser
@@ -145,7 +160,6 @@ export const LogoutService = async (req , res)=>{
 
 
 export const RefreshTokensService = async (req , res)=>{
-    /** @comment : it's better create a middleware to verify the refresh token because you will need it also in the logout service */
     const {refreshtoken} = req.headers
 
     const decodedData = verifyToken(refreshtoken , process.env.JWT_REFRESH_SECRET)
@@ -173,12 +187,11 @@ export const ForgetPasswordService = async (req , res)=>{
 
     const otp = uniqueString();
 
-    const otpEpired = Date.now() + 60 * 60 * 1000; // otpExpired
+    const otpExpired = Date.now() + 60 * 60 * 1000; 
 
-    // What if the otps not returned from the database with the user document
-    user.otps?.resetPassword = {
+    user.otps.resetPassword = {
         code : hashSync(otp , +process.env.SALT_ROUNDS),
-        expiresAt : otpEpired
+        expiresAt : otpExpired
     }
     await user.save()
 
@@ -193,8 +206,7 @@ export const ForgetPasswordService = async (req , res)=>{
 
 
 export const ResetPasswordService = async (req , res)=>{
-    /** @comment : remove the confirmNewPassword because it's not used */
-    const {email , otp , newPassword , confirmNewPassword}  = req.body; 
+    const {email , otp , newPassword }  = req.body; 
 
     const user = await User.findOne({email , provider:ProviderEnum.LOCAL})
     if(!user) return res.status(404).json({message : "User Not Foun"})
@@ -218,30 +230,43 @@ export const ResetPasswordService = async (req , res)=>{
 }
 
 
-/** @comment : in this api we need to make the user re-login after updating the password so we need to revoke his access token and refresh token */
-export const UpdatePasswordService = async (req , res)=>{
-    const {_id : userId} = req.loggedInUser
+export const UpdatePasswordService = async (req, res) => {
+  const {
+    token: { tokenId: accessId, expirationDate: accessExp },
+    _id: userId,
+  } = req.loggedInUser;
 
-    const {oldPassword , newPassword , confirmNewPassword} = req.body;
+  const { oldPassword, newPassword, confirmNewPassword } = req.body;
 
-    if(oldPassword === newPassword) return res.status(400).json({message : "new password is the old password change it!!"});
+  if (newPassword !== confirmNewPassword)
+    return res.status(400).json({ message: "Passwords do not match" });
 
-    const user = await User.findById(userId)
+  if (oldPassword === newPassword)
+    return res
+      .status(400)
+      .json({ message: "New password cannot be the same as the old one" });
 
-    if(!user) return res.status(404).json({message : "user Not Found"}) 
+  const user = await User.findById(userId);
+  if (!user) return res.status(404).json({ message: "User not found" });
 
-    const isPasswordMatched = compareSync(oldPassword , user.password);
+  const isPasswordMatched = compareSync(oldPassword, user.password);
+  if (!isPasswordMatched)
+    return res.status(400).json({ message: "Invalid old password" });
 
-    if(!isPasswordMatched) return res.status(400).json({message : "Invalid Old Password"})
+  const hashedPassword = hashSync(newPassword, +process.env.SALT_ROUNDS);
+  user.password = hashedPassword;
+  await user.save();
 
-    const hashPassword = hashSync(newPassword , +process.env.SALT_ROUNDS)
+  await BlackListedTokens.create({
+    tokenId: accessId,
+    expirationDate: new Date(accessExp * 1000),
+  });
 
-    user.password = hashPassword
-
-    await user.save()
-
-    return res.status(200).json({message : "Password Updated successfully"})
-}
+  return res.status(200).json({
+    message:
+      "Password updated successfully. Please log in again to continue securely.",
+  });
+};
 
 
 export const AuthServiceWithGmail = async (req , res)=>{
@@ -256,7 +281,6 @@ export const AuthServiceWithGmail = async (req , res)=>{
     const {email , given_name , family_name , email_verified , sub} = ticket.getPayload()
     if(!email_verified) return res.status(400).json({message : "Email is not verified"})
 
-    // find user with email and provider from out database
     const isUserExist = await User.findOne({googleSub:sub , provider:ProviderEnum.GOOGLE});
     let newUser ;
     if(!isUserExist){
@@ -300,27 +324,6 @@ export const AuthServiceWithGmail = async (req , res)=>{
 }   
 
 
-/** @comment : Upload profile picture should be moved to user.service.js */
-export const UploadProfileService = async(req, res)=>{
-
-    const {_id} = req.loggedInUser
-    const {path} = req.file
-
-    const {secure_url , public_id} = await UploadFileOnCloudinary(
-        path,
-        {
-            folder: 'Nasse7a_App/Users/Profiles',
-            resource_type: 'image'
-        }
-    )
-
-    const user = await User.findByIdAndUpdate(_id,{profilePicture:{
-        secure_url,
-        public_id
-    }} , {new:true})
-
-    return res.status(200).json({message : "profile uploaded successfully" , user})
-}
 
 
 

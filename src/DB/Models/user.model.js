@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema(
     },
     age: {
       type: Number,
-      min: [18, "Age must be at least 18 years old"], // How the min age here is 18 and in the schema it's 15 ?
+      min: [18, "Age must be at least 18 years old"], 
       max: [100, "Age must be at most 100 years old "],
       index: {
         name: "idx_age",
@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
-      enum:Object.values(GenderEnum),
+      enum: Object.values(GenderEnum),
       default: GenderEnum.MALE,
     },
     email: {
@@ -41,41 +41,41 @@ const userSchema = new mongoose.Schema(
       type: String,
       requierd: true,
     },
-    phoneNumber : {
-      type:String,
-      requierd : true
+    phoneNumber: {
+      type: String,
+      requierd: true
     },
     otps : {
-      confirmation : String,
-      resetPassword : {
-        code :  String,
-        expiresAt : Date
+      confirmation: String,
+      resetPassword: {
+        code:  String,
+        expiresAt: Date
       },
     },
-    isConfirmed : {
-      type : Boolean,
-      default : false
+    isConfirmed: {
+      type: Boolean,
+      default: false
     },
-    role:{
-      type:String,
-      enum:Object.values(RolesEnum),
-      default:RolesEnum.USER
+    role: {
+      type: String,
+      enum: Object.values(RolesEnum),
+      default: RolesEnum.USER
     },
     provider : {
       type:String,
       enum:Object.values(ProviderEnum),
-      default : ProviderEnum.LOCAL
+      default: ProviderEnum.LOCAL
     },
-    googleSub : String,
-    profilePicture:{
-      secure_url:String,
-      public_id:String
+    googleSub: String,
+    profilePicture: {
+      secure_url: String,
+      public_id: String
     },
     devices: [String]
   },
   {
     timestamps: true,
-    toJSON : {
+    toJSON: {
       virtuals: true
     },
     virtuals: {
@@ -99,7 +99,7 @@ userSchema.index(
   { firstName: 1, lastName: 1 },
   { name: "idx_firs_last_unique", unique: true }
 );
-userSchema.virtual("Messages" , {
+userSchema.virtual("Messages", {
   ref:"Messages",
   localField:"_id",
   foreignField:"receiverId"
