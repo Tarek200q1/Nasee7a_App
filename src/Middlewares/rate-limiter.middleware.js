@@ -9,10 +9,10 @@ export const limiter = rateLimit({
 
     if(country_code == "EG") return 30
     return 15
-  } ,
-  requestPropertyName : 'rate_limit',
+  },
+  requestPropertyName: 'rate_limit',
   statusCode: 429,
-  legacyHeaders:false,
+  legacyHeaders: false,
   message: 'To many requests from this IP , please try again after 15 minutes',
   keyGenerator: (req)=>{
     const ip = ipKeyGenerator(req.headers['x-forwarded-for']);
@@ -20,7 +20,7 @@ export const limiter = rateLimit({
   },
   store: new MongoStore({
     uri: process.env.DB_URL_LOCAL,
-    collectionName : "rateLimiter",
+    collectionName: "rateLimiter",
     expireTimeMs: 5 * 60 * 1000,
   })
 });

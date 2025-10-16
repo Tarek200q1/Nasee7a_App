@@ -4,8 +4,8 @@ import { authenticationMiddleware } from "../../Middlewares/authentication.middl
 const messageRouter = Router();
 
 
-messageRouter.post('/send/:receiverId' , services.sendMessageService)
-messageRouter.get('/get-messages-one-user' , authenticationMiddleware , services.getMessagesService)
+messageRouter.post('/send/:receiverId', services.sendMessageService)
+messageRouter.get('/get-messages-one-user', authenticationMiddleware , services.getMessagesService)
 messageRouter.get("/getAll-message", services.getAllPublicMessageService);
 
 

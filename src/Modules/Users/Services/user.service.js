@@ -1,99 +1,68 @@
+import fs from "node:fs";
+import mongoose from "mongoose";
 import { DeleteFileFromCloudinary, UploadFileOnCloudinary } from "../../../Common/Services/cloudinary.service.js";
-import { User , Messages } from "../../../DB/Models/index.js";
-import fs from 'node:fs'
+import { User, Messages } from "../../../DB/Models/index.js";
 
+// Update user account info
+export const UpdateAccountService = async (req, res) => {
+  const { _id } = req.loggedInUser;
+  const { firstName, lastName, email, age, gender } = req.body;
 
-export const UpdateAccountService = async(req , res)=>{
-    
+  if (email) {
+    const isEmailExists = await User.findOne({ email });
+    if (isEmailExists) return res.status(409).json({ message: "Email already exists" });
+  }
 
-<<<<<<< Updated upstream
-    const {_id} = req.loggedInUser
-    const {firstName , lastName , email , age , gender} = req.body;
+  const user = await User.findByIdAndUpdate(
+    _id,
+    { firstName, lastName, email, age, gender },
+    { new: true }
+  );
 
-    // What if the user enter an new email and it's already exists in the database
-    if(email){
-        const isEmailExists = await User.findOne({email})
-        if(isEmailExists) return res.status(409).json({message : "Email already exists"})
-    }
+  if (!user) return res.status(404).json({ message: "User not found" });
 
-    // find user by userId
-    const user = await User.findByIdAndUpdate(
-        _id,
-        {firstName , lastName , email , age , gender},
-        {new:true}
-    )
-
-    if(!user) return res.status(404).json({message : "User not found"})
-    
-    return res.status(200).json({message : "User updated successfully" })
-=======
-      const {_id} = req.loggedInUser
-      const {firstName , lastName , email , age , gender} = req.body;
-
-        // find user by userId
-      const user = await User.findByIdAndUpdate(
-            _id,
-            {firstName , lastName , email , age , gender},
-            {new:true}
-        )
-
-      if(!user) return res.status(404).json({message : "User not found"})
-      
-      if(email){
-        const isEmailExists = await User.findOne({email})
-        if(isEmailExists) return res.status(409).json({message : "Email already exists"})
-      }
-      return res.status(200).json({message : "User updated successfully" })
->>>>>>> Stashed changes
-        
+  return res.status(200).json({ message: "User updated successfully" });
 };
 
+// Delete user account
 export const DeleteAccountService = async (req, res) => {
-  // start session
   const session = await mongoose.startSession();
-    const {user: { _id },} = req.loggedInUser;
+  const {
+    user: { _id },
+  } = req.loggedInUser;
 
-    // start transaction
-    session.startTransaction();
+  session.startTransaction();
 
-    const deletedUser = await User.findByIdAndDelete({ _id }, { session });
-    if (!deletedUser) {
-      await session.abortTransaction();
-      session.endSession();
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // unlink profile picture (locally)
-    fs.unlinkSync(deletedUser.profilePicture)
-
-    // delete by public id
-    await DeleteFileFromCloudinary(deletedUser.profilePicture.public_id)
-
-    // delete user messages
-    await Messages.deleteMany({ receiverId: _id }, { session });
-
-    // commit transaction
-    await session.commitTransaction();
-
-    // end sessionnode
+  const deletedUser = await User.findByIdAndDelete(_id, { session });
+  if (!deletedUser) {
+    await session.abortTransaction();
     session.endSession();
+    return res.status(404).json({ message: "User not found" });
+  }
 
-<<<<<<< Updated upstream
-    return res.status(200).json({ message: "User deleted successfully", deletedUser }); // why we return deletedUser in the response
-=======
-    return res.status(200).json({ message: "User deleted successfully" });
->>>>>>> Stashed changes
-  
+  // Remove profile picture locally
+  if (deletedUser.profilePicture?.secure_url) {
+    fs.unlinkSync(deletedUser.profilePicture.secure_url);
+    await DeleteFileFromCloudinary(deletedUser.profilePicture.public_id);
+  }
+
+  // Delete user messages
+  await Messages.deleteMany({ receiverId: _id }, { session });
+
+  await session.commitTransaction();
+  session.endSession();
+
+  return res.status(200).json({ message: "User deleted successfully" });
 };
 
-export const ListUsersService = async (req, res) =>{
-    let users = await User.find().populate("Messages").select("firstName lastName age gender email phoneNumber")
-
-    return res.status(200).json({ users });
-};
-
+// Upload profile picture
 export const UploadProfileService = async (req, res) => {
   const { _id } = req.loggedInUser;
+
+  if (!req.file) {
+    return res.status(400).json({ message: "No file uploaded" });
+  }
+
   const { path } = req.file;
 
   const { secure_url, public_id } = await UploadFileOnCloudinary(path, {
@@ -103,19 +72,18 @@ export const UploadProfileService = async (req, res) => {
 
   const user = await User.findByIdAndUpdate(
     _id,
-    {
-      profilePicture: {
-        secure_url,
-        public_id,
-      },
-    },
+    { profilePicture: { secure_url, public_id } },
     { new: true }
   );
 
-  return res
-    .status(200)
-    .json({ message: "profile uploaded successfully", user });
+  return res.status(200).json({ message: "Profile uploaded successfully", user });
 };
 
+// List all users
+export const ListUsersService = async (req, res) => {
+  const users = await User.find()
+    .populate("Messages")
+    .select("firstName lastName age gender email phoneNumber");
 
-
+  return res.status(200).json({ users });
+};

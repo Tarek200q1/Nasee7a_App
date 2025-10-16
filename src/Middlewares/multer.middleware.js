@@ -15,7 +15,7 @@ export const hostUpload = ()=>{
         const fileExtension = file.mimetype.split('/')[1]
         if(!allowedFileExtensions[fileType].includes(fileExtension)) return cb(new Error('Invalid file extension') , false)
         
-        return cb(null , true)
+        return cb(null, true)
     }
-    return multer({ fileFilter , storage})
+    return multer({ fileFilter, storage })
 }
