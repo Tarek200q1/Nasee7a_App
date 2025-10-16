@@ -54,7 +54,10 @@ app.use(async(err , req , res , next) => {
         await req.session.abortTransaction();
         // end session
         session.endSession();
-            console.log("The transaction is aborted", err);
+<<<<<<< Updated upstream
+        console.log("The transaction is aborted", err);
+=======
+>>>>>>> Stashed changes
     }
     res.status(err.cause || 500).json({message : "something broke!" , err:err.message , stack: err.stack})
 });

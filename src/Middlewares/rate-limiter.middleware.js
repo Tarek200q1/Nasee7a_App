@@ -9,7 +9,7 @@ export const limiter = rateLimit({
 
     if(country_code == "EG") return 30
     return 15
-  } ,
+  },
   requestPropertyName: 'rate_limit',
   statusCode: 429,
   legacyHeaders: false,

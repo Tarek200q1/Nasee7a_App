@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema(
     },
     age: {
       type: Number,
-      min: [18, "Age must be at least 18 years old"],
+      min: [18, "Age must be at least 18 years old"], // How the min age here is 18 and in the schema it's 15 ?
       max: [100, "Age must be at most 100 years old "],
       index: {
         name: "idx_age",
@@ -46,6 +46,7 @@ const userSchema = new mongoose.Schema(
       requierd: true
     },
     otps: {
+<<<<<<< HEAD
       confirmation: String,
       resetPassword: {
         code:  String,
@@ -55,6 +56,17 @@ const userSchema = new mongoose.Schema(
     isConfirmed: {
       type: Boolean,
       default: false
+=======
+      confirmation : String,
+      resetPassword : {
+        code :  String,
+        expiresAt : Date
+      },
+    },
+    isConfirmed: {
+      type : Boolean,
+      default : false
+>>>>>>> master
     },
     role:{
       type:String,
@@ -62,12 +74,21 @@ const userSchema = new mongoose.Schema(
       default:RolesEnum.USER
     },
     provider: {
+<<<<<<< HEAD
       type: String,
       enum: Object.values(ProviderEnum),
       default: ProviderEnum.LOCAL
     },
     googleSub: String,
     profilePicture: {
+=======
+      type:String,
+      enum:Object.values(ProviderEnum),
+      default : ProviderEnum.LOCAL
+    },
+    googleSub: String,
+    profilePicture:{
+>>>>>>> master
       secure_url:String,
       public_id:String
     },
